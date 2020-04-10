@@ -4,32 +4,21 @@ import (
 	"log"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/gpio"
-	"gobot.io/x/gobot/platforms/raspi"
+	"periph.io/x/periph/conn/gpio"
+	"periph.io/x/periph/host"
+	"periph.io/x/periph/host/rpi"
 )
 
 func main() {
-	adapter := raspi.NewAdaptor()
-	led := gpio.NewLedDriver(adapter, "7")
-
-	work := func() {
-		gobot.Every(5*time.Second, func() {
-			err := led.Toggle()
-			if err != nil {
-				log.Fatalf("An error occurred turning on the LED!")
-			}
-		})
+	if _, err := host.Init(); err != nil {
+		log.Fatal(err)
 	}
 
-	robot := gobot.NewRobot("snapshot",
-		[]gobot.Connection{adapter},
-		[]gobot.Device{led},
-		work,
-	)
-
-	err := robot.Start()
-	if err != nil {
-		log.Fatalf("Could not start the damn robot")
+	t := time.NewTicker(500 * time.Millisecond)
+	for l := gpio.Low; ; l = !l {
+		if err := rpi.P1_18.Out(l); err != nil {
+			log.Fatal(err)
+		}
+		<-t.C
 	}
 }
