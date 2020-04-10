@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -13,8 +14,11 @@ func main() {
 	led := gpio.NewLedDriver(adapter, "18")
 
 	work := func() {
-		gobot.Every(1*time.Second, func() {
-			led.Toggle()
+		gobot.Every(5*time.Second, func() {
+			err := led.Toggle()
+			if err != nil {
+				log.Fatalf("An error occurred turning on the LED!")
+			}
 		})
 	}
 
@@ -24,5 +28,8 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	err := robot.Start()
+	if err != nil {
+		log.Fatalf("Could not start the damn robot")
+	}
 }
