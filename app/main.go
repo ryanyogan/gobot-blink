@@ -15,7 +15,7 @@ func main() {
 	}
 
 	t := time.NewTicker(500 * time.Millisecond)
-	for l := gpio.Low; ; l = !l {
+	for l := gpio.High; ; l = !l {
 		if err := rpi.P1_18.Out(l); err != nil {
 			log.Fatal(err)
 		}
